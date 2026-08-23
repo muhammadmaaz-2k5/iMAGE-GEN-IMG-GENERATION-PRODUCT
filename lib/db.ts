@@ -71,7 +71,7 @@ export async function saveThumbnailRecord(record: GeneratedThumbnailRecord): Pro
   }
 
   // Fallback to in-memory store
-  const existingIdx = inMemoryThumbnails.findIndex(t => t.id === record.id);
+  const existingIdx = inMemoryThumbnails.findIndex((t: GeneratedThumbnailRecord) => t.id === record.id);
   if (existingIdx >= 0) {
     inMemoryThumbnails[existingIdx] = record;
   } else {
@@ -89,7 +89,19 @@ export async function getThumbnailRecords(platform?: string, limit = 50): Promis
         take: limit,
       });
 
-      return rows.map(r => ({
+      return rows.map((r: {
+        id: string;
+        prompt: string;
+        enhancedPrompt: string;
+        platform: string;
+        aspectRatio: string;
+        width: number;
+        height: number;
+        style: string;
+        imageUrl: string;
+        cloudinaryId: string | null;
+        createdAt: Date;
+      }) => ({
         id: r.id,
         prompt: r.prompt,
         enhanced_prompt: r.enhancedPrompt,
@@ -108,7 +120,7 @@ export async function getThumbnailRecords(platform?: string, limit = 50): Promis
   }
 
   if (platform && platform !== 'all') {
-    return inMemoryThumbnails.filter(t => t.platform === platform).slice(0, limit);
+    return inMemoryThumbnails.filter((t: GeneratedThumbnailRecord) => t.platform === platform).slice(0, limit);
   }
   return inMemoryThumbnails.slice(0, limit);
 }
@@ -124,7 +136,7 @@ export async function deleteThumbnailRecord(id: string): Promise<boolean> {
     }
   }
 
-  const idx = inMemoryThumbnails.findIndex(t => t.id === id);
+  const idx = inMemoryThumbnails.findIndex((t: GeneratedThumbnailRecord) => t.id === id);
   if (idx >= 0) {
     inMemoryThumbnails.splice(idx, 1);
   }
