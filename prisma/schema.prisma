@@ -1,0 +1,24 @@
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model GeneratedThumbnail {
+  id              String   @id
+  prompt          String
+  enhancedPrompt  String   @map("enhanced_prompt")
+  platform        String
+  aspectRatio     String   @map("aspect_ratio")
+  width           Int
+  height          Int
+  style           String   @default("cinematic")
+  imageUrl        String   @map("image_url")
+  cloudinaryId    String?  @map("cloudinary_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@map("generated_thumbnails")
+}
