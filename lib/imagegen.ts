@@ -33,9 +33,9 @@ export function buildFullPrompt(request: GenerationRequest): { fullPrompt: strin
     promptParts.push(lighting.promptSuffix);
   }
 
-  // Add quality booster if enhance is requested
+  // Add quality booster and text-avoidance guidance if enhance is requested
   if (request.enhancePrompt) {
-    promptParts.push('masterpiece, ultra-sharp focus, volumetric lighting, award-winning thumbnail composition, rich vibrant color grade, highly detailed textures');
+    promptParts.push('masterpiece, ultra-sharp focus, volumetric lighting, award-winning thumbnail composition, rich vibrant color grade, highly detailed textures, clean render');
   }
 
   const fullPrompt = promptParts.filter(Boolean).join(', ');

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { STYLE_OPTIONS, LIGHTING_OPTIONS, SAMPLE_PROMPTS, PlatformPreset } from '@/lib/presets';
-import { Sparkles, Wand2, Dices, X, Lightbulb, Flame, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Wand2, Dices, X, Lightbulb, Flame, ChevronDown, ChevronUp, AlertTriangle, Info } from 'lucide-react';
 
 interface PromptStudioProps {
   prompt: string;
@@ -47,6 +47,22 @@ export function PromptStudio({
 
   return (
     <div className="space-y-4">
+      {/* AI Model Capability Note */}
+      <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-200 text-xs flex items-start gap-2.5">
+        <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <p className="font-semibold text-amber-300 flex items-center gap-1.5">
+            Important AI Model Note
+          </p>
+          <p className="text-[11px] text-amber-200/90 leading-relaxed">
+            This image generation AI is designed for <strong>visual scenes, 3D artwork, characters, and lighting</strong>. It <strong>cannot reliably render written words, titles, or complex flowcharts</strong> (it will draw warped/gibberish letters).
+          </p>
+          <p className="text-[10.5px] text-amber-300/80 pt-0.5">
+            👉 <strong>Tip:</strong> Describe the visual scene (e.g. <em>"Futuristic glowing server room with neon cyber aesthetic"</em>) instead of asking it to print specific text.
+          </p>
+        </div>
+      </div>
+
       {/* Prompt Input Box */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
@@ -59,7 +75,7 @@ export function PromptStudio({
               onClick={handleRandomPrompt}
               type="button"
               className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs transition-colors border border-white/10"
-              title="Insert a random creative prompt"
+              title="Insert a random creative visual prompt"
             >
               <Dices className="w-3.5 h-3.5 text-pink-400" />
               <span>Surprise Me</span>
@@ -82,7 +98,7 @@ export function PromptStudio({
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Describe your thumbnail concept in detail (e.g. 'A futuristic AI robot chef preparing a breakfast feast in a neon cyberpunk kitchen')..."
+            placeholder="Describe the visual scene (e.g. 'A sleek futuristic black laptop in a cyberpunk developer room with glowing neon blue and purple server data streams')..."
             rows={3}
             className="w-full px-4 py-3 rounded-xl bg-slate-900/80 border border-white/10 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 text-sm resize-none transition-all"
           />
