@@ -85,17 +85,12 @@ export async function uploadImageBufferToCloudinary(
         uploadStream.end(buffer);
       });
 
-      // Generate customized aspect ratio transformation URL
+      // Generate clean, valid aspect ratio transformation URL
       let transformedUrl = uploadResult.secure_url;
-      if (aspectRatio && uploadResult.public_id) {
-        const arFormat = aspectRatio.replace(':', '_');
-        transformedUrl = cloudinary.url(uploadResult.public_id, {
-          transformation: [
-            { crop: 'fill', gravity: 'auto', aspect_ratio: arFormat },
-            ...(targetWidth && targetHeight ? [{ width: targetWidth, height: targetHeight }] : []),
-            { quality: 'auto', fetch_format: 'auto' },
-          ],
-        });
+      if (aspectRatio) {
+        // Valid Cloudinary aspect ratio syntax: ar_16:9, ar_1:1, ar_9:16, ar_4:5, ar_1.91:1, ar_2:3
+        const transformSegment = `ar_${aspectRatio},c_fill,g_auto,f_auto,q_auto`;
+        transformedUrl = uploadResult.secure_url.replace('/upload/', `/upload/${transformSegment}/`);
       }
 
       return {
@@ -109,8 +104,7 @@ export async function uploadImageBufferToCloudinary(
         isCloudinary: true,
       };
     } catch (error) {
-      console.warn('[Cloudinary] Upload failed with preset/signed config, retrying default signed stream:', error);
-      // Fallback without preset if preset had restrictions
+      console.warn('[Cloudinary] Upload with preset failed, retrying signed upload stream:', error);
       try {
         const fallbackResult = await new Promise<UploadApiResponse>((resolve, reject) => {
           const fallbackStream = cloudinary.uploader.upload_stream(
@@ -119,11 +113,18 @@ export async function uploadImageBufferToCloudinary(
               public_id: publicId,
               tags,
               resource_type: 'image',
+              format: 'jpg',
             },
             (err, res) => (err || !res ? reject(err) : resolve(res))
           );
           fallbackStream.end(buffer);
         });
+
+        let transformedUrl = fallbackResult.secure_url;
+        if (aspectRatio) {
+          const transformSegment = `ar_${aspectRatio},c_fill,g_auto,f_auto,q_auto`;
+          transformedUrl = fallbackResult.secure_url.replace('/upload/', `/upload/${transformSegment}/`);
+        }
 
         return {
           url: fallbackResult.url,
@@ -132,7 +133,7 @@ export async function uploadImageBufferToCloudinary(
           width: fallbackResult.width,
           height: fallbackResult.height,
           format: fallbackResult.format,
-          transformedUrl: fallbackResult.secure_url,
+          transformedUrl,
           isCloudinary: true,
         };
       } catch (innerError) {
